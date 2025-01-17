@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gudangux/models/warehouse.dart';
-import 'package:gudangux/screens/warehouse/warehouse_add_screen.dart';
-import 'package:gudangux/screens/warehouse/warehouse_detail_screen.dart';
+import 'package:gudangux/pages/warehouse/warehouse_add_screen.dart';
+import 'package:gudangux/pages/warehouse/warehouse_detail_screen.dart';
 import 'package:gudangux/services/warehouse_service.dart';
 
 class WarehouseListScreen extends StatefulWidget {

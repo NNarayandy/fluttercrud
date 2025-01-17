@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/item.dart';
-import 'package:gudangux/services/item_service.dart';
 
 class ItemListScreenGuest extends StatefulWidget {
   @override
@@ -13,14 +13,26 @@ class _ItemListScreenGuestState extends State<ItemListScreenGuest> {
   @override
   void initState() {
     super.initState();
-    _itemsFuture = ItemService.getItems();
+    _itemsFuture = _fetchItems();
+  }
+
+  Future<List<Item>> _fetchItems() async {
+    try {
+      final response = await Api.readItem(); // Memanggil fungsi dari api.dart
+      List<Item> items = (response['items'] as List)
+          .map((item) => Item.fromJson(item))
+          .toList();
+      return items;
+    } catch (e) {
+      throw Exception('Failed to load items: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Items guest'),
+        title: Text('Items Guest'),
       ),
       body: FutureBuilder<List<Item>>(
         future: _itemsFuture,

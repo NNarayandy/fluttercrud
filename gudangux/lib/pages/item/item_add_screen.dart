@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gudangux/services/item_service.dart';
+import 'package:gudangux/config/api.dart';
 
 class ItemAddScreen extends StatefulWidget {
   @override
@@ -13,15 +13,13 @@ class _ItemAddScreenState extends State<ItemAddScreen> {
   late int _quantity;
   late int _warehouseId;
 
-// ...
-
-// ...
-
 void _submitForm() async {
   if (_formKey.currentState!.validate()) {
     _formKey.currentState!.save();
     try {
-      final response = await ItemService.createItem(_name, _description, _quantity, _warehouseId);
+      // Memanggil fungsi createItem dari api.dart
+      final response = await Api.createItem(_name, _description, _quantity, _warehouseId);
+
       if (response['success']) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -34,15 +32,12 @@ void _submitForm() async {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred while creating item')),
+        SnackBar(content: Text('An error occurred while creating the item: $e')),
       );
     }
   }
 }
 
-// ...
-
-// ...
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gudangux/screens/admin/admin_home_screen.dart';
-import 'package:gudangux/services/admin_service.dart';
+import 'package:gudangux/config/api.dart';
+import 'package:gudangux/pages/admin/DashboardAdmin.dart';
 
-class AdminLoginScreen extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _AdminLoginScreenState createState() => _AdminLoginScreenState();
+  _LoginPagState createState() => _LoginPagState();
 }
 
-class _AdminLoginScreenState extends State<AdminLoginScreen> {
+class _LoginPagState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -16,7 +16,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   String password = _passwordController.text;
 
   try {
-    final response = await AdminService.login(username, password);
+    // Memanggil fungsi login dari api.dart
+    final response = await Api.login(username, password);
 
     if (response['success']) {
       int adminId = int.parse(response['admin_id']);
@@ -57,6 +58,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     );
   }
 }
+
 
   @override
   Widget build(BuildContext context) {

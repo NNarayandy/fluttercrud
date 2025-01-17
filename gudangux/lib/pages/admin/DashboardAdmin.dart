@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:gudangux/screens/item/item_list_screen.dart';
-import 'package:gudangux/screens/transaction/transaction_list_screen.dart';
-import 'package:gudangux/screens/warehouse/warehouse_list_screen.dart';
+import 'package:gudangux/pages/item/item_list_screen.dart';
+import 'package:gudangux/pages/transaction/transaction_list_screen.dart';
+import 'package:gudangux/pages/warehouse/warehouse_list_screen.dart';
 
 
 

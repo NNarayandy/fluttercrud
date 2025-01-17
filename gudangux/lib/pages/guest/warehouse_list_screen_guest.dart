@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/warehouse.dart';
-import 'package:gudangux/services/warehouse_service.dart';
 
 class WarehouseListScreenGuest extends StatefulWidget {
   @override
@@ -13,14 +13,26 @@ class _WarehouseListScreenGuestState extends State<WarehouseListScreenGuest> {
   @override
   void initState() {
     super.initState();
-    _warehousesFuture = WarehouseService.getWarehouses();
+    _warehousesFuture = _fetchWarehouses();
+  }
+
+  Future<List<Warehouse>> _fetchWarehouses() async {
+    try {
+      final response = await Api.readWarehouse(); // Memanggil API dari api.dart
+      List<Warehouse> warehouses = (response['warehouses'] as List)
+          .map((warehouse) => Warehouse.fromJson(warehouse))
+          .toList();
+      return warehouses;
+    } catch (e) {
+      throw Exception('Failed to load warehouses: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Warehouses guest'),
+        title: Text('Warehouses Guest'),
       ),
       body: FutureBuilder<List<Warehouse>>(
         future: _warehousesFuture,

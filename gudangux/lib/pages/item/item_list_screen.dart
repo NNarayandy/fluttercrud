@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/item.dart';
-import 'package:gudangux/screens/item/item_add_screen.dart';
-import 'package:gudangux/screens/item/item_detail_screen.dart';
-import 'package:gudangux/services/item_service.dart';
+import 'package:gudangux/pages/item/item_add_screen.dart';
+import 'package:gudangux/pages/item/item_detail_screen.dart';
 
 class ItemListScreen extends StatefulWidget {
   @override
@@ -15,24 +15,39 @@ class _ItemListScreenState extends State<ItemListScreen> {
   @override
   void initState() {
     super.initState();
-    _itemsFuture = ItemService.getItems();
+    _itemsFuture = _fetchItems();
+  }
+
+  Future<List<Item>> _fetchItems() async {
+    try {
+      final response = await Api.readItem(); // Memanggil fungsi API
+      List<Item> items = (response['items'] as List)
+          .map((item) => Item.fromJson(item))
+          .toList();
+      return items;
+    } catch (e) {
+      throw Exception('Failed to load items: $e');
+    }
   }
 
   void _deleteItem(int id) async {
     try {
-      bool success = (await ItemService.deleteItem(id)) as bool;
-      if (success) {
+      final response = await Api.deleteItem(id); // Memanggil fungsi API
+      if (response['success']) {
         setState(() {
-          _itemsFuture = ItemService.getItems();
+          _itemsFuture = _fetchItems();
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Item deleted successfully')),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete item')),
+          SnackBar(content: Text(response['message'])),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred while deleting item')),
+        SnackBar(content: Text('An error occurred while deleting item: $e')),
       );
     }
   }

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gudangux/screens/guest/item_list_screen_guest.dart';
-import 'package:gudangux/screens/guest/warehouse_list_screen_guest.dart';
+import 'package:gudangux/pages/guest/guest_home_screen.dart';
+import 'package:gudangux/pages/auth/loginPage.dart';
 
-
-class GuestHomeScreen extends StatelessWidget {
+class Welcomepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Guest Home'),
+        title: Text('Gudang App'),
       ),
       body: Center(
         child: Column(
@@ -18,19 +17,20 @@ class GuestHomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>ItemListScreenGuest()),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
-              child: Text('View Items'),
+              child: Text('Admin Login'),
             ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => WarehouseListScreenGuest()),
+                  MaterialPageRoute(builder: (context) => GuestHomeScreen()),
                 );
               },
-              child: Text('View Warehouses'),
+              child: Text('Guest Mode'),
             ),
           ],
         ),

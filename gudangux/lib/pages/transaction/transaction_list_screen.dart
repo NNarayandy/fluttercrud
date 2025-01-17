@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/transaction.dart';
-import 'package:gudangux/screens/transaction/transaction_add_screen.dart';
-import 'package:gudangux/screens/transaction/transaction_detail_screen.dart';
-import 'package:gudangux/services/transaction_service.dart';
+import 'package:gudangux/pages/transaction/transaction_add_screen.dart';
+import 'package:gudangux/pages/transaction/transaction_detail_screen.dart';
 
 class TransactionListScreen extends StatefulWidget {
   @override
@@ -15,7 +15,21 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   @override
   void initState() {
     super.initState();
-    _transactionsFuture = TransactionService.getTransactions();
+    _transactionsFuture = _fetchTransactions(); // Panggil fungsi fetch data
+  }
+
+  Future<List<Transaction>> _fetchTransactions() async {
+    try {
+      final response = await Api.readTransaction(); // Panggil API
+      if (response['success']) {
+        final List<dynamic> data = response['data']; // Ambil data dari response
+        return data.map((json) => Transaction.fromJson(json)).toList();
+      } else {
+        throw Exception(response['message']);
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch transactions: $e');
+    }
   }
 
   @override

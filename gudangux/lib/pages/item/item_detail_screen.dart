@@ -1,48 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:gudangux/models/warehouse.dart';
-import 'package:gudangux/screens/warehouse/warehouse_edit_screen.dart';
-import 'package:gudangux/services/warehouse_service.dart';
+import 'package:gudangux/models/item.dart';
+import 'package:gudangux/pages/item/item_edit_screen.dart';
+import 'package:gudangux/services/item_service.dart';
 
-class WarehouseDetailScreen extends StatefulWidget {
-  final int warehouseId;
+class ItemDetailScreen extends StatefulWidget {
+  final int itemId;
 
-  WarehouseDetailScreen({required this.warehouseId});
+  ItemDetailScreen({required this.itemId});
 
   @override
-  _WarehouseDetailScreenState createState() => _WarehouseDetailScreenState();
+  _ItemDetailScreenState createState() => _ItemDetailScreenState();
 }
 
-class _WarehouseDetailScreenState extends State<WarehouseDetailScreen> {
-  late Future<Warehouse> _warehouseFuture;
+class _ItemDetailScreenState extends State<ItemDetailScreen> {
+  late Future<Item> _itemFuture;
 
   @override
   void initState() {
     super.initState();
-    _warehouseFuture = WarehouseService.getWarehouseById(widget.warehouseId);
+    _itemFuture = ItemService.getItemById(widget.itemId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Warehouse Detail'),
+        title: Text('Item Detail'),
       ),
-      body: FutureBuilder<Warehouse>(
-        future: _warehouseFuture,
+      body: FutureBuilder<Item>(
+        future: _itemFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            Warehouse warehouse = snapshot.data!;
+            Item item = snapshot.data!;
             return Padding(
               padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    warehouse.name,
+                    'Name: ${item.name}',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
-                  Text('Location: ${warehouse.location}'),
+                  Text('Description: ${item.description ?? 'N/A'}'),
+                  SizedBox(height: 10),
+                  Text('Quantity: ${item.quantity}'),
+                  SizedBox(height: 10),
+                  Text('Warehouse ID: ${item.warehouseId}'),
                 ],
               ),
             );
@@ -57,7 +61,7 @@ class _WarehouseDetailScreenState extends State<WarehouseDetailScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => WarehouseEditScreen(warehouseId: widget.warehouseId),
+              builder: (context) => ItemEditScreen(itemId: widget.itemId),
             ),
           );
         },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gudangux/services/transaction_service.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:intl/intl.dart';
 
 class TransactionAddScreen extends StatefulWidget {
@@ -14,18 +14,27 @@ class _TransactionAddScreenState extends State<TransactionAddScreen> {
   late String _type;
   late DateTime _date;
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      String formattedDate = DateFormat('yyyy-MM-dd').format(_date);
-      TransactionService.createTransaction(_itemId, _quantity, _type, formattedDate)
-          .then((success) {
-        if (success) {
+
+      try {
+        final response = await Api.createTransaction(_itemId, _quantity, _type); // Panggil API
+        if (response['success']) {
           Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Transaction created successfully')),
+          );
         } else {
-          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
         }
-      });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
     }
   }
 
@@ -95,7 +104,7 @@ class _TransactionAddScreenState extends State<TransactionAddScreen> {
                   }
                 },
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (_date == null) {
                     return 'Please select a date';
                   }
                   return null;
@@ -103,6 +112,7 @@ class _TransactionAddScreenState extends State<TransactionAddScreen> {
                 controller: TextEditingController(
                   text: _date != null ? DateFormat('yyyy-MM-dd').format(_date) : '',
                 ),
+                readOnly: true,
               ),
               SizedBox(height: 20),
               ElevatedButton(

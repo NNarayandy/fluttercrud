@@ -1,52 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:gudangux/models/item.dart';
-import 'package:gudangux/screens/item/item_edit_screen.dart';
-import 'package:gudangux/services/item_service.dart';
+import 'package:gudangux/models/transaction.dart';
+import 'package:gudangux/pages/transaction/transaction_edit_screen.dart';
+import 'package:gudangux/services/transaction_service.dart';
 
-class ItemDetailScreen extends StatefulWidget {
-  final int itemId;
+class TransactionDetailScreen extends StatefulWidget {
+  final int transactionId;
 
-  ItemDetailScreen({required this.itemId});
+  TransactionDetailScreen({required this.transactionId});
 
   @override
-  _ItemDetailScreenState createState() => _ItemDetailScreenState();
+  _TransactionDetailScreenState createState() => _TransactionDetailScreenState();
 }
 
-class _ItemDetailScreenState extends State<ItemDetailScreen> {
-  late Future<Item> _itemFuture;
+class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
+  late Future<Transaction> _transactionFuture;
 
   @override
   void initState() {
     super.initState();
-    _itemFuture = ItemService.getItemById(widget.itemId);
+    _transactionFuture = TransactionService.getTransactionById(widget.transactionId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Item Detail'),
+        title: Text('Transaction Detail'),
       ),
-      body: FutureBuilder<Item>(
-        future: _itemFuture,
+      body: FutureBuilder<Transaction>(
+        future: _transactionFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            Item item = snapshot.data!;
+            Transaction transaction = snapshot.data!;
             return Padding(
               padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Name: ${item.name}',
+                    'Transaction #${transaction.id}',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
-                  Text('Description: ${item.description ?? 'N/A'}'),
+                  Text('Item ID: ${transaction.itemId}'),
                   SizedBox(height: 10),
-                  Text('Quantity: ${item.quantity}'),
+                  Text('Quantity: ${transaction.quantity}'),
                   SizedBox(height: 10),
-                  Text('Warehouse ID: ${item.warehouseId}'),
+                  Text('Type: ${transaction.type}'),
+                  SizedBox(height: 10),
+                  Text('Date: ${transaction.date}'),
                 ],
               ),
             );
@@ -61,7 +63,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ItemEditScreen(itemId: widget.itemId),
+              builder: (context) => TransactionEditScreen(transactionId: widget.transactionId),
             ),
           );
         },

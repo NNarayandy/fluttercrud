@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gudangux/models/warehouse.dart';
+import 'package:gudangux/config/api.dart'; // Mengimport api.dart
 import 'package:gudangux/pages/warehouse/warehouse_edit_screen.dart';
-import 'package:gudangux/services/warehouse_service.dart';
 
 class WarehouseDetailScreen extends StatefulWidget {
   final int warehouseId;
@@ -18,7 +18,20 @@ class _WarehouseDetailScreenState extends State<WarehouseDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _warehouseFuture = WarehouseService.getWarehouseById(widget.warehouseId);
+    // Menggunakan API dari api.dart untuk mendapatkan data warehouse
+    _warehouseFuture = fetchWarehouseDetail(widget.warehouseId);
+  }
+
+  Future<Warehouse> fetchWarehouseDetail(int id) async {
+    try {
+      final data = await Api.detailWarehouse(id);
+      if (data['message'] != null) {
+        throw Exception(data['message']);
+      }
+      return Warehouse.fromJson(data); // Memetakan data ke model Warehouse
+    } catch (e) {
+      throw Exception('Failed to load warehouse: $e');
+    }
   }
 
   @override

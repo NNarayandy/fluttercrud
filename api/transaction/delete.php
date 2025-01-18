@@ -8,7 +8,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 include $_SERVER['DOCUMENT_ROOT'] . '/gudangdb/api/database.php';
 
-$transactionController = new TransactionController();
 
 $data = json_decode(file_get_contents("php://input"));
 

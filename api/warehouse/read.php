@@ -5,8 +5,6 @@ header("Content-Type: application/json; charset=UTF-8");
 
 include $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/database.php';
 
-$warehouseController = new WarehouseController();
-
 $warehouses = $warehouseController->getAllWarehouses();
 
 if (!empty($warehouses)) {

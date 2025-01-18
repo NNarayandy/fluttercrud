@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart'; // Mengimpor API dari api.dart
 import 'package:gudangux/models/warehouse.dart';
-import 'package:gudangux/services/warehouse_service.dart';
 
 class WarehouseEditScreen extends StatefulWidget {
   final int warehouseId;
@@ -20,19 +20,39 @@ class _WarehouseEditScreenState extends State<WarehouseEditScreen> {
   @override
   void initState() {
     super.initState();
-    _warehouseFuture = WarehouseService.getWarehouseById(widget.warehouseId);
+    // Ambil data warehouse yang akan diedit
+    _warehouseFuture = _getWarehouseDetails();
+  }
+
+  Future<Warehouse> _getWarehouseDetails() async {
+    // Panggil API untuk mendapatkan detail warehouse
+    final data = await Api.detailWarehouse(widget.warehouseId);
+    return Warehouse.fromJson(data); // Pastikan menggunakan model yang sesuai
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      WarehouseService.updateWarehouse(widget.warehouseId, _name, _location)
-          .then((success) {
-        if (success) {
+
+      // Panggil API updateWarehouse dari api.dart untuk mengupdate data warehouse
+      Api.updateWarehouse(widget.warehouseId, _name, _location).then((response) {
+        if (response['message'] == 'Warehouse updated successfully') {
+          // Tampilkan pesan sukses dan kembali ke layar sebelumnya
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Warehouse updated successfully')),
+          );
           Navigator.pop(context);
         } else {
-          // Show error message
+          // Tampilkan pesan error jika update gagal
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to update warehouse')),
+          );
         }
+      }).catchError((e) {
+        // Tampilkan pesan error jika ada masalah dengan API
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       });
     }
   }

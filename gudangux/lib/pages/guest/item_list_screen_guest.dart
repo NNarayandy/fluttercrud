@@ -13,19 +13,7 @@ class _ItemListScreenGuestState extends State<ItemListScreenGuest> {
   @override
   void initState() {
     super.initState();
-    _itemsFuture = _fetchItems();
-  }
-
-  Future<List<Item>> _fetchItems() async {
-    try {
-      final response = await Api.readItem(); // Memanggil fungsi dari api.dart
-      List<Item> items = (response['items'] as List)
-          .map((item) => Item.fromJson(item))
-          .toList();
-      return items;
-    } catch (e) {
-      throw Exception('Failed to load items: $e');
-    }
+    _itemsFuture = Api.getDataItemFunction(); // Memanggil API untuk mengambil data item
   }
 
   @override

@@ -5,7 +5,6 @@ header("Content-Type: application/json; charset=UTF-8");
 
 include $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/database.php';
 
-$transactionController = new TransactionController();
 
 $transactions = $transactionController->getAllTransactions();
 

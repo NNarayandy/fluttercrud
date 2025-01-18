@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/item.dart';
-import 'package:gudangux/pages/item/item_add_screen.dart';
 import 'package:gudangux/pages/item/ItemDetail.dart';
+import 'package:gudangux/pages/item/item_add_screen.dart';
 
 class ItemListScreen extends StatefulWidget {
   @override
@@ -18,39 +18,42 @@ class _ItemListScreenState extends State<ItemListScreen> {
     _itemsFuture = _fetchItems();
   }
 
+  // Fungsi untuk mengambil data item
   Future<List<Item>> _fetchItems() async {
     try {
-      final response = await Api.readItem(); // Memanggil fungsi API
-      List<Item> items = (response['items'] as List)
-          .map((item) => Item.fromJson(item))
-          .toList();
+      // Memanggil fungsi API untuk mengambil data item
+      List<Item> items = await Api.getDataItemFunction();
       return items;
     } catch (e) {
       throw Exception('Failed to load items: $e');
     }
   }
 
+  // Fungsi untuk menghapus item
   void _deleteItem(int id) async {
-    try {
-      final response = await Api.deleteItem(id); // Memanggil fungsi API
-      if (response['success']) {
-        setState(() {
-          _itemsFuture = _fetchItems();
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Item deleted successfully')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
-      }
-    } catch (e) {
+  try {
+    final response = await Api.deleteItem(id);  // Memanggil fungsi API untuk menghapus item
+    print('Response: ${response.toString()}');  // Untuk melihat hasil respons API
+
+    if (response['success']) {
+      setState(() {
+        _itemsFuture = _fetchItems(); // Memperbarui list item setelah dihapus
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred while deleting item: $e')),
+        SnackBar(content: Text('Item deleted successfully')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])), // Menampilkan pesan jika gagal
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('An error occurred while deleting item: $e')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

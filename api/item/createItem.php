@@ -13,8 +13,6 @@ $description = $_POST['description'];
 $quantity = $_POST['quantity'];
 $warehouseId = $_POST['warehouse_id'];
 
-$item = new Item($conn);
-
 if ($item->create($name, $description, $quantity, $warehouseId)) {
     http_response_code(201);
     echo json_encode(array("success" => true, "message" => "Item created successfully."));

@@ -1,6 +1,5 @@
 <?php
-include_once '../../config/database.php';
-include_once '../../models/Warehouse.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/models/Warehouse.php';
 
 class WarehouseController {
     private $conn;

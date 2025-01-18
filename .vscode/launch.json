@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "Flutter (lib\\pages\\warehouse\\warehouse_add_screen.dart)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "gudangux",
+            "program": "lib\\pages\\warehouse\\warehouse_add_screen.dart"
+        }
+    ]
+}

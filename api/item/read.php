@@ -1,9 +1,10 @@
 <?php
-include_once '../../config/database.php';
-include_once '../../controllers/ItemController.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
+
+include $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/gudangdb/api/controllers/ItemController.php';
 
 $itemController = new ItemController();
 

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:gudangux/models/item.dart';
-import 'package:gudangux/services/item_service.dart';
+import 'package:gudangux/config/api.dart';
 
-class ItemEditScreen extends StatefulWidget {
+class UpdateItem extends StatefulWidget {
   final int itemId;
 
-  ItemEditScreen({required this.itemId});
+  UpdateItem({required this.itemId});
 
   @override
-  _ItemEditScreenState createState() => _ItemEditScreenState();
+  _UpdateItemState createState() => _UpdateItemState();
 }
 
-class _ItemEditScreenState extends State<ItemEditScreen> {
+class _UpdateItemState extends State<UpdateItem> {
   final _formKey = GlobalKey<FormState>();
   late Future<Item> _itemFuture;
   late String _name;
@@ -22,39 +22,39 @@ class _ItemEditScreenState extends State<ItemEditScreen> {
   @override
   void initState() {
     super.initState();
-    _itemFuture = ItemService.getItemById(widget.itemId);
+    _itemFuture = Api.detailItem(widget.itemId).then((data) {
+      return Item.fromJson(data['data']); // Pastikan format response cocok
+    });
   }
 
- // ...
-
- // ...
-
-void _submitForm() async {
-  if (_formKey.currentState!.validate()) {
-    _formKey.currentState!.save();
-    try {
-      final response = await ItemService.updateItem(widget.itemId, _name, _description, _quantity, _warehouseId);
-      if (response['success']) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Item updated successfully')),
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      try {
+        final response = await Api.updateItemFunction(
+          widget.itemId,
+          _name,
+          _description,
+          _quantity,
+          _warehouseId,
         );
-      } else {
+        if (response['success']) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Item updated successfully')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
+          SnackBar(content: Text('An error occurred while updating item')),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred while updating item')),
-      );
     }
   }
-}
-
-// ...
-
-// ...
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +68,9 @@ void _submitForm() async {
           if (snapshot.hasData) {
             Item item = snapshot.data!;
             _name = item.name;
-            _description = item.description!;
+            _description = item.description ?? '';
             _quantity = item.quantity;
-            _warehouseId = item.warehouseId;
+            _warehouseId = item.warehouseId!;
             return Padding(
               padding: EdgeInsets.all(16.0),
               child: Form(

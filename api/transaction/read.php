@@ -1,9 +1,9 @@
 <?php
-include_once '../../config/database.php';
-include_once '../../controllers/TransactionController.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
+
+include $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/database.php';
 
 $transactionController = new TransactionController();
 

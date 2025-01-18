@@ -1,24 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/transaction.dart';
-import 'package:gudangux/pages/transaction/transaction_edit_screen.dart';
-import 'package:gudangux/services/transaction_service.dart';
+import 'package:gudangux/pages/transaction/UpdateTransaksi.dart';
 
-class TransactionDetailScreen extends StatefulWidget {
+class Detailtransaksi extends StatefulWidget {
   final int transactionId;
 
-  TransactionDetailScreen({required this.transactionId});
+  Detailtransaksi({required this.transactionId});
 
   @override
-  _TransactionDetailScreenState createState() => _TransactionDetailScreenState();
+  _DetailtransaksiState createState() => _DetailtransaksiState();
 }
 
-class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
+class _DetailtransaksiState extends State<Detailtransaksi> {
   late Future<Transaction> _transactionFuture;
 
   @override
   void initState() {
     super.initState();
-    _transactionFuture = TransactionService.getTransactionById(widget.transactionId);
+    _transactionFuture = _fetchTransactionDetails(widget.transactionId);
+  }
+
+  Future<Transaction> _fetchTransactionDetails(int id) async {
+    try {
+      final response = await Api.detailTransaksi(id);
+      if (response['success']) {
+        return Transaction.fromJson(response['data']);
+      } else {
+        throw Exception(response['message']);
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch transaction: $e');
+    }
   }
 
   @override
@@ -30,7 +43,11 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       body: FutureBuilder<Transaction>(
         future: _transactionFuture,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
             Transaction transaction = snapshot.data!;
             return Padding(
               padding: EdgeInsets.all(16.0),
@@ -52,10 +69,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 ],
               ),
             );
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
           }
-          return Center(child: CircularProgressIndicator());
+          return Center(child: Text('No data found'));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -63,7 +78,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TransactionEditScreen(transactionId: widget.transactionId),
+              builder: (context) => Updatetransaksi(transactionId: widget.transactionId),
             ),
           );
         },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/transaction.dart';
 import 'package:gudangux/pages/transaction/transaction_add_screen.dart';
-import 'package:gudangux/pages/transaction/transaction_detail_screen.dart';
+import 'package:gudangux/pages/transaction/detailTransaksi.dart';
 
 class TransactionListScreen extends StatefulWidget {
   @override
@@ -55,7 +55,7 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TransactionDetailScreen(transactionId: transaction.id),
+                        builder: (context) => Detailtransaksi(transactionId: transaction.id),
                       ),
                     );
                   },

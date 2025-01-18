@@ -2,19 +2,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Api {
-  static const String baseUrl = 'http://192.168.1.9/gudangdb/backend/api';
+  static const String baseUrl = 'http://192.168.1.9/gudangdb/api';
 
   static const String adminLogin = '$baseUrl/admin/login.php';
 
   static const String itemCreate = '$baseUrl/item/create.php';
   static const String itemDelete = '$baseUrl/item/delete.php';
   static const String itemRead = '$baseUrl/item/read.php';
-  static const String itemUpdate = '$baseUrl/item/update.php';
+  static const String itemDetail = '$baseUrl/item/itemDetail.php';
+  static const String updateItem = '$baseUrl/item/Updateitem.php';
 
   static const String transactionCreate = '$baseUrl/transaction/create.php';
   static const String transactionDelete = '$baseUrl/transaction/delete.php';
   static const String transactionRead = '$baseUrl/transaction/read.php';
-  static const String transactionUpdate = '$baseUrl/transaction/update.php';
+  static const String updatetransaksi = '$baseUrl/transaction/updateTransaksi.php';
+  static const String detailtransaksi = '$baseUrl/transaction/detailTransaksi.php';
 
   static const String warehouseCreate = '$baseUrl/warehouse/create.php';
   static const String warehouseDelete = '$baseUrl/warehouse/delete.php';
@@ -67,7 +69,7 @@ class Api {
     }
   }
 
-  static Future<Map<String, dynamic>> updateItem(int id, String name, String description, int quantity, int warehouseId) async {
+  static Future<Map<String, dynamic>> updateItemFunction(int id, String name, String description, int quantity, int warehouseId) async {
     final body = {
       'id': id.toString(),
       'name': name,
@@ -77,7 +79,7 @@ class Api {
     };
 
     final response = await http.post(
-      Uri.parse(itemUpdate),
+      Uri.parse(updateItem),
       body: body,
     );
 
@@ -106,6 +108,20 @@ class Api {
   static Future<Map<String, dynamic>> readItem() async {
     final response = await http.get(
       Uri.parse(itemRead));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception('Failed to read item. Status code: ${response.statusCode}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> detailItem(int id) async {
+    final response = await http.post(
+      Uri.parse(itemDetail),
+      body: {'id': id.toString()},
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -145,7 +161,7 @@ class Api {
     };
 
     final response = await http.post(
-      Uri.parse(transactionUpdate),
+      Uri.parse(updatetransaksi),
       body: body,
     );
 
@@ -174,6 +190,20 @@ class Api {
   static Future<Map<String, dynamic>> readTransaction() async {
     final response = await http.get(
       Uri.parse(transactionRead));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception('Failed to read transaction. Status code: ${response.statusCode}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> detailTransaksi(int id) async {
+    final response = await http.post(
+      Uri.parse(detailtransaksi),
+      body: {'id': id.toString()},
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

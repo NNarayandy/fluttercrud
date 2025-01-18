@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/item.dart';
 import 'package:gudangux/pages/item/item_add_screen.dart';
-import 'package:gudangux/pages/item/item_detail_screen.dart';
+import 'package:gudangux/pages/item/ItemDetail.dart';
 
 class ItemListScreen extends StatefulWidget {
   @override
@@ -78,7 +78,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ItemDetailScreen(itemId: item.id),
+                        builder: (context) => ItemDetail(itemId: item.id),
                       ),
                     );
                   },

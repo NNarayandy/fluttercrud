@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gudangux/services/warehouse_service.dart';
+import 'package:gudangux/config/api.dart'; // Import API
 
 class WarehouseAddScreen extends StatefulWidget {
   @override
@@ -11,17 +11,27 @@ class _WarehouseAddScreenState extends State<WarehouseAddScreen> {
   late String _name;
   late String _location;
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      WarehouseService.createWarehouse(_name, _location)
-          .then((success) {
-        if (success) {
+
+      try {
+        final response = await Api.createWarehouse(_name, _location); // Panggil API
+        if (response['success']) {
           Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Warehouse created successfully')),
+          );
         } else {
-          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
         }
-      });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred while creating warehouse')),
+        );
+      }
     }
   }
 

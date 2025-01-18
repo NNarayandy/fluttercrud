@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/transaction.dart';
-import 'package:gudangux/services/transaction_service.dart';
 import 'package:intl/intl.dart';
 
-class TransactionEditScreen extends StatefulWidget {
+class Updatetransaksi extends StatefulWidget {
   final int transactionId;
 
-  TransactionEditScreen({required this.transactionId});
+  Updatetransaksi({required this.transactionId});
 
   @override
-  _TransactionEditScreenState createState() => _TransactionEditScreenState();
+  _UpdatetransaksiState createState() => _UpdatetransaksiState();
 }
 
-class _TransactionEditScreenState extends State<TransactionEditScreen> {
+class _UpdatetransaksiState extends State<Updatetransaksi> {
   final _formKey = GlobalKey<FormState>();
   late Future<Transaction> _transactionFuture;
   late int _itemId;
@@ -23,20 +23,31 @@ class _TransactionEditScreenState extends State<TransactionEditScreen> {
   @override
   void initState() {
     super.initState();
-    _transactionFuture = TransactionService.getTransactionById(widget.transactionId);
+    _transactionFuture = Api.detailTransaksi(widget.transactionId).then((data) {
+      return Transaction.fromJson(data['data']);
+    });
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      String formattedDate = DateFormat('yyyy-MM-dd').format(_date);
-      TransactionService.updateTransaction(widget.transactionId, _itemId, _quantity, _type, formattedDate)
-          .then((success) {
-        if (success) {
+      DateFormat('yyyy-MM-dd').format(_date);
+
+      // Memanggil API langsung dari api.dart
+      Api.updateTransaction(widget.transactionId, _itemId, _quantity, _type).then((data) {
+        if (data['success']) {
           Navigator.pop(context);
         } else {
           // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to update transaction')),
+          );
         }
+      }).catchError((error) {
+        // Handle error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $error')),
+        );
       });
     }
   }

@@ -1,24 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:gudangux/config/api.dart';
 import 'package:gudangux/models/item.dart';
-import 'package:gudangux/pages/item/item_edit_screen.dart';
-import 'package:gudangux/services/item_service.dart';
+import 'package:gudangux/pages/item/UpdateItem.dart';
 
-class ItemDetailScreen extends StatefulWidget {
+class ItemDetail extends StatefulWidget {
   final int itemId;
 
-  ItemDetailScreen({required this.itemId});
+  ItemDetail({required this.itemId});
 
   @override
-  _ItemDetailScreenState createState() => _ItemDetailScreenState();
+  _ItemDetailState createState() => _ItemDetailState();
 }
 
-class _ItemDetailScreenState extends State<ItemDetailScreen> {
+class _ItemDetailState extends State<ItemDetail> {
   late Future<Item> _itemFuture;
 
   @override
   void initState() {
     super.initState();
-    _itemFuture = ItemService.getItemById(widget.itemId);
+    _itemFuture = _fetchItemDetail(widget.itemId);
+  }
+
+  Future<Item> _fetchItemDetail(int id) async {
+    try {
+      final response = await Api.detailItem(id); // Panggil API detailItem
+      if (response['success']) {
+        return Item.fromJson(response['data']); // Parsing JSON ke model Item
+      } else {
+        throw Exception(response['message']);
+      }
+    } catch (e) {
+      throw Exception('Failed to load item detail: $e');
+    }
   }
 
   @override
@@ -30,7 +43,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       body: FutureBuilder<Item>(
         future: _itemFuture,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
             Item item = snapshot.data!;
             return Padding(
               padding: EdgeInsets.all(16.0),
@@ -42,7 +59,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
-                  Text('Description: ${item.description ?? 'N/A'}'),
+                  Text('Description: ${item.description}'),
                   SizedBox(height: 10),
                   Text('Quantity: ${item.quantity}'),
                   SizedBox(height: 10),
@@ -50,10 +67,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                 ],
               ),
             );
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            return Center(child: Text('No data found.'));
           }
-          return Center(child: CircularProgressIndicator());
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -61,7 +77,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ItemEditScreen(itemId: widget.itemId),
+              builder: (context) => UpdateItem(itemId: widget.itemId),
             ),
           );
         },

@@ -1,6 +1,5 @@
 <?php
-include_once '../../config/database.php';
-include_once '../../models/Admin.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/models/Admin.php';
 
 class AdminController {
     private $conn;

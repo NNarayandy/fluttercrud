@@ -1,32 +1,30 @@
 <?php
-
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
 include $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/database.php';
 
-// Query untuk membaca data transaksi
-$sql = "SELECT id, item_id, quantity, type, date FROM transaction";
+$sql = "SELECT id, name, location FROM warehouse";
 $result = $conn->query($sql);
 
-$transactions = [];
+$warehouses = [];
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $transactions[] = $row;
+        $warehouses[] = $row;
     }
 }
 
-if (!empty($transactions)) {
+if (!empty($warehouses)) {
     echo json_encode([
         "success" => true,
-        "data" => $transactions
+        "data" => $warehouses
     ]);
 } else {
     http_response_code(404);
     echo json_encode([
         "success" => false,
-        "message" => "No transactions found."
+        "message" => "No warehouses found."
     ]);
 }
 

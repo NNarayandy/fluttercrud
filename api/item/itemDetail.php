@@ -1,13 +1,14 @@
 <?php
-header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET");
+header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/gudangdb/api/database.php';
 
-// Cek apakah parameter 'id' dikirim melalui URL
-if (!isset($_GET['id'])) {
+// Validasi input
+if (!isset($_POST['id'])) {
+    error_log('Missing parameter: id'); // Log error untuk debugging
     http_response_code(400);
     echo json_encode([
         "success" => false,
@@ -16,23 +17,38 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
-$id = intval($_GET['id']);
+$id = intval($_POST['id']);
 
-// Query untuk mengambil detail item berdasarkan ID
+// Query untuk mengambil detail item
 $sql = "SELECT id, name, description, quantity, warehouse_id FROM item WHERE id = ?";
 $stmt = $conn->prepare($sql);
+if (!$stmt) {
+    error_log('Failed to prepare statement: ' . $conn->error); // Log error jika statement gagal
+    http_response_code(500);
+    echo json_encode([
+        "success" => false,
+        "message" => "Server error while preparing statement"
+    ]);
+    exit();
+}
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Periksa apakah data ditemukan
 if ($result->num_rows > 0) {
     $item = $result->fetch_assoc();
     echo json_encode([
         "success" => true,
-        "data" => $item
+        "data" => [
+            "id" => $item["id"],
+            "name" => $item["name"],
+            "description" => $item["description"] ?? null,
+            "quantity" => $item["quantity"],
+            "warehouse_id" => $item["warehouse_id"]
+        ]
     ]);
 } else {
+    error_log('Item not found with id: ' . $id); // Log jika item tidak ditemukan
     http_response_code(404);
     echo json_encode([
         "success" => false,
@@ -40,7 +56,6 @@ if ($result->num_rows > 0) {
     ]);
 }
 
-// Tutup koneksi
 $stmt->close();
 $conn->close();
 ?>

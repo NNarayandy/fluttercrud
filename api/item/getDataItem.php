@@ -1,5 +1,6 @@
 <?php
 
+// Headers untuk CORS dan JSON
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -24,12 +25,10 @@ if ($result->num_rows > 0) {
         );
         array_push($items, $item);
     }
-    // Mengirimkan data dalam format JSON
-    echo json_encode($items);
-} else {
-    // Jika tidak ada data
-    echo json_encode(array("message" => "No items found"));
 }
+
+// Kirim respons JSON (kosong jika tidak ada data)
+echo json_encode($items);
 
 // Menutup koneksi
 $conn->close();

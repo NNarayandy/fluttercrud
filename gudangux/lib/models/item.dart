@@ -17,7 +17,7 @@ class Item {
     return Item(
       id: int.tryParse(json['id'].toString()) ?? 0, // Fallback ke 0 jika parsing gagal
       name: json['name'] ?? 'Unknown', // Default value jika null
-      description: json['description'], // Bisa null
+      description: json['description'] ?? '', // Default kosong jika null
       quantity: int.tryParse(json['quantity'].toString()) ?? 0, // Fallback ke 0
       warehouseId: json['warehouse_id'] != null
           ? int.tryParse(json['warehouse_id'].toString())

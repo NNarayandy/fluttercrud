@@ -1,5 +1,4 @@
 <?php
-// Mengatur header agar API dapat diakses dari aplikasi Anda
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: POST');
@@ -10,33 +9,57 @@ include $_SERVER['DOCUMENT_ROOT'].'/gudangdb/api/database.php';
 // Mendapatkan data JSON dari request
 $data = json_decode(file_get_contents("php://input"), true);
 
+// Validasi ID
 // Validasi data yang diterima
-if (!isset($data['id']) || !isset($data['name']) || !isset($data['quantity']) || !isset($data['warehouse_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Incomplete data provided.']);
-    exit;
+if (!isset($data['id'])) {
+    echo json_encode(['success' => false, 'message' => 'ID is required.']);
+    exit();
 }
+
 
 // Menyimpan data ke dalam variabel
 $id = $conn->real_escape_string($data['id']);
-$name = $conn->real_escape_string($data['name']);
-$description = isset($data['description']) ? $conn->real_escape_string($data['description']) : null;
-$quantity = $conn->real_escape_string($data['quantity']);
-$warehouse_id = $conn->real_escape_string($data['warehouse_id']);
+$updates = [];
 
-// Query untuk update data
-$query = "UPDATE item 
-          SET name = '$name', 
-              description = " . ($description ? "'$description'" : "NULL") . ", 
-              quantity = '$quantity', 
-              warehouse_id = '$warehouse_id' 
-          WHERE id = '$id'";
+// Menambahkan field untuk diupdate jika ada di input
+if (!empty($data['name'])) {
+    $name = $conn->real_escape_string($data['name']);
+    $updates[] = "name = '$name'";
+}
 
+if (isset($data['description'])) { // Bisa kosong, jadi gunakan isset
+    $description = $data['description'] !== null 
+        ? "'" . $conn->real_escape_string($data['description']) . "'" 
+        : "NULL";
+    $updates[] = "description = $description";
+}
+
+if (!empty($data['quantity'])) {
+    $quantity = $conn->real_escape_string($data['quantity']);
+    $updates[] = "quantity = '$quantity'";
+}
+
+if (!empty($data['warehouse_id'])) {
+    $warehouse_id = $conn->real_escape_string($data['warehouse_id']);
+    $updates[] = "warehouse_id = '$warehouse_id'";
+}
+
+// Jika tidak ada field yang diperbarui, kirimkan respon gagal
+if (empty($updates)) {
+    echo json_encode(['success' => false, 'message' => 'No fields to update.']);
+    exit();
+}
+
+// Membuat query update
+$query = "UPDATE item SET " . implode(', ', $updates) . " WHERE id = '$id'";
+
+// Eksekusi query
 if ($conn->query($query) === TRUE) {
     echo json_encode(['success' => true, 'message' => 'Item updated successfully.']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Error updating item: ' . $conn->error]);
 }
 
-// Menutup koneksi
+// Tutup koneksi
 $conn->close();
 ?>

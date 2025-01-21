@@ -10,6 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Gudang App',
+      debugShowCheckedModeBanner: false, // This removes the debug banner
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

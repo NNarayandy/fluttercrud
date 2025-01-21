@@ -24,7 +24,12 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
   void initState() {
     super.initState();
     _transactionFuture = Api.detailTransaksi(widget.transactionId).then((data) {
-      return Transaction.fromJson(data['data']);
+      Transaction transaction = Transaction.fromJson(data['data']);
+      _itemId = transaction.itemId;
+      _quantity = transaction.quantity;
+      _type = transaction.type;
+      _date = transaction.date; // Inisialisasi _date di sini
+      return transaction;
     });
   }
 
@@ -38,13 +43,13 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
         if (data['success']) {
           Navigator.pop(context);
         } else {
-          // Show error message
+          // Tampilkan pesan error
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to update transaction')),
+            SnackBar(content: Text('Gagal memperbarui transaksi')),
           );
         }
       }).catchError((error) {
-        // Handle error
+        // Tangani error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $error')),
         );
@@ -56,17 +61,12 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Transaction'),
+        title: Text('Edit Transaksi'),
       ),
       body: FutureBuilder<Transaction>(
         future: _transactionFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            Transaction transaction = snapshot.data!;
-            _itemId = transaction.itemId;
-            _quantity = transaction.quantity;
-            _type = transaction.type;
-            _date = DateTime.parse(transaction.date);
             return Padding(
               padding: EdgeInsets.all(16.0),
               child: Form(
@@ -75,11 +75,11 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
                   children: [
                     TextFormField(
                       initialValue: _itemId.toString(),
-                      decoration: InputDecoration(labelText: 'Item ID'),
+                      decoration: InputDecoration(labelText: 'ID Item'),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter an item ID';
+                          return 'Mohon masukkan ID item';
                         }
                         return null;
                       },
@@ -87,11 +87,11 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
                     ),
                     TextFormField(
                       initialValue: _quantity.toString(),
-                      decoration: InputDecoration(labelText: 'Quantity'),
+                      decoration: InputDecoration(labelText: 'Jumlah'),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter a quantity';
+                          return 'Mohon masukkan jumlah';
                         }
                         return null;
                       },
@@ -99,7 +99,7 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
                     ),
                     DropdownButtonFormField<String>(
                       value: _type,
-                      decoration: InputDecoration(labelText: 'Type'),
+                      decoration: InputDecoration(labelText: 'Tipe'),
                       items: ['in', 'out'].map((type) {
                         return DropdownMenuItem<String>(
                           value: type,
@@ -108,7 +108,7 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
                       }).toList(),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please select a type';
+                          return 'Mohon pilih tipe';
                         }
                         return null;
                       },
@@ -116,7 +116,7 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
                     ),
                     TextFormField(
                       initialValue: DateFormat('yyyy-MM-dd').format(_date),
-                      decoration: InputDecoration(labelText: 'Date'),
+                      decoration: InputDecoration(labelText: 'Tanggal'),
                       onTap: () async {
                         final DateTime? picked = await showDatePicker(
                           context: context,
@@ -132,7 +132,7 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
                       },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please select a date';
+                          return 'Mohon pilih tanggal';
                         }
                         return null;
                       },
@@ -143,7 +143,7 @@ class _UpdatetransaksiState extends State<Updatetransaksi> {
                     SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _submitForm,
-                      child: Text('Save'),
+                      child: Text('Simpan'),
                     ),
                   ],
                 ),

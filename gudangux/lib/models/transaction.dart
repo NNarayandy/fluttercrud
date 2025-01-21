@@ -3,7 +3,7 @@ class Transaction {
   final int itemId;
   final int quantity;
   final String type;
-  final String date;
+  final DateTime date;
 
   Transaction({
     required this.id,
@@ -15,21 +15,11 @@ class Transaction {
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
-      id: int.parse(json['id'] ?? '0'),
-      itemId: int.parse(json['item_id'] ?? '0'),
-      quantity: int.parse(json['quantity'] ?? '0'),
-      type: json['type'] ?? '',
-      date: json['date'] ?? '',
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      itemId: int.tryParse(json['item_id'].toString()) ?? 0,
+      quantity: int.tryParse(json['quantity'].toString()) ?? 0,
+      type: json['type'] ?? 'undefined',
+      date: DateTime.parse(json['date']),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': itemId,
-      'quantity': quantity,
-      'type': type,
-      'date': date,
-    };
   }
 }

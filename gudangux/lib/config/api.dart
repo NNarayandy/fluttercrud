@@ -3,7 +3,7 @@ import 'package:gudangux/models/item.dart';
 import 'package:http/http.dart' as http;
 
 class Api {
-  static const String baseUrl = 'http://localhost/gudangdb/api';
+  static const String baseUrl = 'http://192.168.136.116/gudangdb/api';
 
   static const String adminLogin = '$baseUrl/admin/login.php';
 
@@ -13,7 +13,7 @@ class Api {
   static const String itemDetail = '$baseUrl/item/itemDetail.php';
   static const String updateItem = '$baseUrl/item/Updateitem.php';
 
-  static const String transactionCreate = '$baseUrl/transaction/create.php';
+  static const String transactionCreate = '$baseUrl/transaction/createTransaksi.php';
   static const String transactionDelete = '$baseUrl/transaction/delete.php';
   static const String transactionRead = '$baseUrl/transaction/read.php';
   static const String updatetransaksi =
@@ -174,26 +174,33 @@ class Api {
 
   // Function Transaction
   static Future<Map<String, dynamic>> createTransaction(
-      int itemId, int quantity, String type) async {
-    final body = {
-      'item_id': itemId.toString(),
-      'quantity': quantity.toString(),
-      'type': type,
-    };
+    int itemId, int quantity, String type, String date) async {
+  final body = jsonEncode({
+    'item_id': itemId,
+    'quantity': quantity,
+    'type': type,
+    'date': date,
+  });
 
-    final response = await http.post(
-      Uri.parse(transactionCreate),
-      body: body,
-    );
+  final response = await http.post(
+    Uri.parse(transactionCreate),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  );
 
-    if (response.statusCode == 201) {
-      final data = jsonDecode(response.body);
-      return data;
-    } else {
-      throw Exception(
-          'Failed to create transaction. Status code: ${response.statusCode}');
-    }
+  // Debug log response
+  print('Response status code: ${response.statusCode}');
+  print('Response body: ${response.body}');
+
+  if (response.statusCode == 201) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception(
+        'Failed to create transaction. Status code: ${response.statusCode}, Body: ${response.body}');
   }
+}
 
   static Future<Map<String, dynamic>> updateTransaction(
       int id, int itemId, int quantity, String type) async {

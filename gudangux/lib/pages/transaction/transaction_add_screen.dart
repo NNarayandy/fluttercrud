@@ -9,49 +9,86 @@ class TransactionAddScreen extends StatefulWidget {
 
 class _TransactionAddScreenState extends State<TransactionAddScreen> {
   final _formKey = GlobalKey<FormState>();
-  late int _itemId;
-  late int _quantity;
-  late String _type;
-  late DateTime _date;
+  int? _itemId;
+  int? _quantity;
+  String? _type;
+  DateTime? _date;
 
   void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+  if (_formKey.currentState!.validate()) {
+    _formKey.currentState!.save();
 
-      try {
-        final response = await Api.createTransaction(_itemId, _quantity, _type); // Panggil API
-        if (response['success']) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Transaction created successfully')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response['message'])),
-          );
-        }
-      } catch (e) {
+    if (_date == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select a date')),
+      );
+      return;
+    }
+
+    String formattedDate = DateFormat('yyyy-MM-dd').format(_date!);
+    print('Submitting transaction with: itemId=$_itemId, quantity=$_quantity, type=$_type, date=$formattedDate');
+
+    try {
+      final response = await Api.createTransaction(
+        _itemId!,
+        _quantity!,
+        _type!,
+        formattedDate,
+      );
+
+      print('Response from API: $response');
+
+      if (response['success']) {
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred: $e')),
+          SnackBar(content: Text('Transaction created successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
         );
       }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
     }
   }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Transaction'),
+        backgroundColor: Colors.teal,
+        centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Add New Transaction',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal,
+                ),
+              ),
+              SizedBox(height: 16.0),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Item ID'),
+                decoration: InputDecoration(
+                  labelText: 'Item ID',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.inventory),
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -61,8 +98,13 @@ class _TransactionAddScreenState extends State<TransactionAddScreen> {
                 },
                 onSaved: (value) => _itemId = int.parse(value!),
               ),
+              SizedBox(height: 16.0),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Quantity'),
+                decoration: InputDecoration(
+                  labelText: 'Quantity',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.numbers),
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -72,12 +114,17 @@ class _TransactionAddScreenState extends State<TransactionAddScreen> {
                 },
                 onSaved: (value) => _quantity = int.parse(value!),
               ),
+              SizedBox(height: 16.0),
               DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Type'),
+                decoration: InputDecoration(
+                  labelText: 'Type',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.merge_type),
+                ),
                 items: ['in', 'out'].map((type) {
                   return DropdownMenuItem<String>(
                     value: type,
-                    child: Text(type),
+                    child: Text(type.toUpperCase()),
                   );
                 }).toList(),
                 validator: (value) {
@@ -86,10 +133,10 @@ class _TransactionAddScreenState extends State<TransactionAddScreen> {
                   }
                   return null;
                 },
-                onChanged: (value) => _type = value!,
+                onChanged: (value) => _type = value,
               ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Date'),
+              SizedBox(height: 16.0),
+              GestureDetector(
                 onTap: () async {
                   final DateTime? picked = await showDatePicker(
                     context: context,
@@ -103,21 +150,43 @@ class _TransactionAddScreenState extends State<TransactionAddScreen> {
                     });
                   }
                 },
-                validator: (value) {
-                  if (_date == null) {
-                    return 'Please select a date';
-                  }
-                  return null;
-                },
-                controller: TextEditingController(
-                  text: _date != null ? DateFormat('yyyy-MM-dd').format(_date) : '',
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Date',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.date_range),
+                    ),
+                    controller: TextEditingController(
+                      text: _date != null
+                          ? DateFormat('yyyy-MM-dd').format(_date!)
+                          : '',
+                    ),
+                    validator: (value) {
+                      if (_date == null) {
+                        return 'Please select a date';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-                readOnly: true,
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Save'),
+              SizedBox(height: 24.0),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 16.0),
+                    backgroundColor: Colors.teal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Save Transaction',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ),
               ),
             ],
           ),

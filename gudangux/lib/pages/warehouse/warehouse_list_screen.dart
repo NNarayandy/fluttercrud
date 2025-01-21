@@ -31,26 +31,31 @@ class _WarehouseListScreenState extends State<WarehouseListScreen> {
   }
 
   Future<void> _deleteWarehouse(int warehouseId) async {
-    try {
-      final response = await Api.deleteWarehouse(warehouseId);
-      if (response['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Warehouse deleted successfully')),
-        );
-        setState(() {
-          _warehousesFuture = _fetchWarehouses();
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Failed to delete warehouse')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
-      );
-    }
+  try {
+  final response = await Api.deleteWarehouse(warehouseId);
+  print('Response status: ${response['success']}');
+  print('Response message: ${response['message']}');
+
+  if (response['success']) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Warehouse deleted successfully')),
+    );
+    setState(() {
+      _warehousesFuture = _fetchWarehouses();
+    });
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(response['message'] ?? 'Failed to delete warehouse')),
+    );
   }
+} catch (e) {
+  print('Error occurred: $e');
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('An error occurred: $e')),
+  );
+}
+}
+
 
   @override
   Widget build(BuildContext context) {

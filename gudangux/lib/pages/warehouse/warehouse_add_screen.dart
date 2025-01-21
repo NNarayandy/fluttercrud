@@ -13,30 +13,31 @@ class _WarehouseAddScreenState extends State<WarehouseAddScreen> {
   late String _location;
 
   void _createWarehouse() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      try {
-        final result = await Api.createWarehouse(_name, _location);
-        print('Success: ${result['message']}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Warehouse created successfully!'),
-          ),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => WarehouseListScreen()),
-        );
-      } catch (e) {
-        print('Error: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to create warehouse: $e'),
-          ),
-        );
-      }
+  if (_formKey.currentState!.validate()) {
+    _formKey.currentState!.save();
+    try {
+      print('Attempting to create warehouse with name: $_name, location: $_location');
+      final result = await Api.createWarehouse(_name, _location);
+      print('Success: ${result['message']}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Warehouse created successfully!'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WarehouseListScreen()),
+      );
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to create warehouse: $e'),
+        ),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

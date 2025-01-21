@@ -16,13 +16,14 @@ class Api {
   static const String transactionCreate = '$baseUrl/transaction/create.php';
   static const String transactionDelete = '$baseUrl/transaction/delete.php';
   static const String transactionRead = '$baseUrl/transaction/read.php';
-  static const String updatetransaksi ='$baseUrl/transaction/updateTransaksi.php';
-  static const String detailtransaksi ='$baseUrl/transaction/detailTransaksi.php';
+  static const String updatetransaksi =
+      '$baseUrl/transaction/updateTransaksi.php';
+  static const String detailtransaksi =
+      '$baseUrl/transaction/detailTransaksi.php';
 
   static const String warehouseCreate = '$baseUrl/warehouse/createWare.php';
   static const String warehouseDelete = '$baseUrl/warehouse/deleteWare.php';
   static const String warehouseRead = '$baseUrl//warehouse/readWare.php';
- 
 
   static Future<Map<String, dynamic>> login(
       String username, String password) async {
@@ -138,7 +139,7 @@ class Api {
       return data
           .map((item) => Item.fromJson(item as Map<String, dynamic>))
           .toList();
-        } else {
+    } else {
       throw Exception(
           'Failed to read item. Status code: ${response.statusCode}');
     }
@@ -276,36 +277,41 @@ class Api {
       'location': location,
     });
 
-    final response = await http.post(
-      Uri.parse(warehouseCreate), // Pastikan URL ini benar
-      headers: {'Content-Type': 'application/json'}, // Set Content-Type
-      body: body,
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(warehouseCreate),
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
 
-    if (response.statusCode == 201) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception(
-          'Failed to create warehouse. Status code: ${response.statusCode}');
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+            'Failed to create warehouse. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error occurred during createWarehouse: $e');
+      throw Exception('Failed to create warehouse.');
     }
   }
 
   static Future<Map<String, dynamic>> deleteWarehouse(int id) async {
-    final response = await http.delete(
-      Uri.parse('$warehouseDelete/$id'),
+    final response = await http.post(
+      Uri.parse(warehouseDelete),
       headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id': id}),
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data;
+      return jsonDecode(response.body);
     } else {
-      throw Exception(
-          'Failed to delete warehouse. Status code: ${response.statusCode}');
+      throw Exception('Failed to delete warehouse.');
     }
   }
-
-
 
   static Future<Map<String, dynamic>> readWarehouse() async {
     try {
